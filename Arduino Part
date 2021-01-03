@@ -32,7 +32,7 @@ void loop() {
 void getData() {
   String path = chipId + " 資料庫目錄 "; //
   FirebaseObject object = Firebase.get(path); 
-  bool Sg1 = object.getBool(" ");
+  bool Sg1 = object.getBool(" 想抓得值的母目錄 ");
   bool Sg2 = object.getBool(" ");
   bool Sg3 = object.getBool(" ");
   bool Sg4 = object.getBool(" ");
