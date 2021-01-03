@@ -1,0 +1,98 @@
+#include <Servo.h>
+#include <ESP8266WiFi.h>
+#include <FirebaseArduino.h>
+
+int slots[8] = {D0,D1,D2,D3,D4,D5,D6,D7};//D1 D2 D3 {5,4,0}
+int a[8] = {false, false, false, false, false, false, false, false};
+
+Servo servo;
+
+#define firebaseURl " "
+#define authCode " " //資料庫金鑰
+#define wifiName " Your WiFi Name "
+#define wifiPass " Your WiFi Password "
+
+String chipId = " Your Database Name "; //資料庫
+
+void setup() {
+  Serial.begin(9600);
+  setupWifi();
+  setupFirebase();
+  setupPinsMode();
+  servo.attach(2);
+  //servo.attach(X);第二顆以上馬達
+  servo.write(0); //閘門關上
+}
+
+void loop() {
+  getData();
+  delay(1000);
+}
+
+void getData() {
+  String path = chipId + " 資料庫目錄 "; //
+  FirebaseObject object = Firebase.get(path); 
+  bool Sg1 = object.getBool(" ");
+  bool Sg2 = object.getBool(" ");
+  bool Sg3 = object.getBool(" ");
+  bool Sg4 = object.getBool(" ");
+  bool Sg5 = object.getBool(" ");
+  bool Sg6 = object.getBool(" ");
+  bool Sg7 = object.getBool(" ");
+  bool Sg8 = object.getBool(" ");
+  bool Sg9 = object.getBool(" ");
+  if (Firebase.failed()) {
+      Serial.print("setting /relal_t failed:");
+      Serial.println(Firebase.error());
+      return;
+  }
+  if(Sg1==true){
+    servo.write(90);
+    delay(1000);
+    Serial.print("Gate001 Open: ");
+    //break;
+  } else {
+    servo.write(0);
+    delay(1000);
+  }
+  
+  Serial.print("GateInfo : ");
+  Serial.print(Sg1);
+  Serial.print(Sg2);
+  Serial.print(Sg3);
+  Serial.print(Sg4);
+  Serial.print(Sg5);
+  Serial.print(Sg6);
+  Serial.print(Sg7);
+  Serial.print(Sg8);
+  Serial.print(Sg9);
+  Serial.println();
+  }
+}
+
+void setupFirebase() {
+  Firebase.begin(firebaseURl, authCode);
+}
+
+
+void setupWifi() {
+  WiFi.begin(wifiName, wifiPass);
+  Serial.println("Hey i 'm connecting...");
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.println(".");
+    delay(500);
+  }
+
+  Serial.println();
+  Serial.println("I 'm connected and my IP address: ");
+  Serial.println(WiFi.localIP());
+}
+
+void setupPinsMode() {
+  // setup Pin mode as output.
+  for (int i=0; i < 8; i++) {
+    Serial.printf("Setup Output for pin %d", slots[i]);
+    pinMode(slots[i], OUTPUT);
+  }
+
+}
